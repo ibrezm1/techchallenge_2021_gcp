@@ -4,13 +4,15 @@
 # cd techchallenge_2021_gcp
 
 # Create and Bq location validity 1 hr only
+echo "Creating BITCOIN Dataset"
 bq --location=US mk -d \
 --description "This is my dataset." \
 BITCOIN
 
+echo "Creating btc train table"
 bq load --autodetect --source_format=CSV BITCOIN.btc_extract_2021-07-07 coin_Bitcoin.csv
 
-
+echo "Creating Model"
 bq query --nouse_legacy_sql \
 'CREATE OR REPLACE MODEL BITCOIN.ga_arima_model
 OPTIONS
@@ -25,6 +27,7 @@ SELECT EXTRACT(DATE FROM Date ) AS parsed_date, Open
 FROM
  `BITCOIN.btc_extract_*`'
 
+echo "Creating Prediction"
  bq query --nouse_legacy_sql \
  'CREATE OR REPLACE TABLE BITCOIN.PRICE_PREDICT AS  SELECT
  *
@@ -32,6 +35,7 @@ FROM
  ML.EXPLAIN_FORECAST(MODEL BITCOIN.ga_arima_model,
                      STRUCT(365 AS horizon, 0.8 AS confidence_level))'
 
+echo "Creating Crash tables"
  bq query --nouse_legacy_sql \
 'CREATE OR REPLACE TABLE BITCOIN.PRICE_CRASH as 
 	select ext.*,csh.crash_open  from `BITCOIN.btc_extract_*` ext left outer join (Select SNo,open as crash_open from (
@@ -40,6 +44,7 @@ FROM
 	) A where old_open is not null) B 
 	WHERE price_chg < -2000) csh on ext.SNo=csh.SNo     '
 
+echo "Creating Covid tables"
 bq query --nouse_legacy_sql \
 'CREATE OR REPLACE TABLE BITCOIN.COVID_IMPACT as 
 	select *  from `BITCOIN.btc_extract_*` WHERE Date >= "2020-03-01" and  Date <= "2021-02-28" ' 
