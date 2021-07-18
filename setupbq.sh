@@ -3,13 +3,14 @@
 # git clone https://github.com/ibrezm1/techchallenge_2021_gcp.git
 # cd techchallenge_2021_gcp
 
-# Create and Bq location
+# Create and Bq location validity 1 hr only
 bq --location=US mk -d \
 --default_table_expiration 3600 \
 --description "This is my dataset." \
 BITCOIN
 
 bq load --autodetect --source_format=CSV BITCOIN.btc_extract_2021-07-07 coin_Bitcoin.csv
+
 
 bq query --nouse_legacy_sql \
 'CREATE OR REPLACE MODEL BITCOIN.ga_arima_model
