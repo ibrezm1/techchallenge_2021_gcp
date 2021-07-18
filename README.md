@@ -12,3 +12,4 @@ cd techchallenge_2021_gcp
 chmod +x setupbq.sh
 ./setupbq.sh
 ```
+## Run the Notebook for Vertex AI setup
