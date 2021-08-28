@@ -42,3 +42,6 @@ jobs:
 
     - name: Use gcloud CLI
       run: gcloud info
+      
+    - name: Use gcloud CLI
+      run: setupbq.sh
