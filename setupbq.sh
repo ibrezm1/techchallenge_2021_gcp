@@ -12,6 +12,22 @@ BITCOIN
 echo "Creating btc train table"
 bq load --autodetect --source_format=CSV BITCOIN.btc_extract_2021-07-07 coin_Bitcoin.csv
 
+echo "de-duplicating tables"
+bq query --nouse_legacy_sql \
+'CREATE OR REPLACE VIEW BITCOIN.v_price_data AS 
+select * except(row_num) from (
+SELECT
+*,
+ROW_NUMBER() OVER (
+PARTITION BY
+EXTRACT(DATE FROM Date)
+ORDER BY
+Date desc
+) row_num
+FROM
+`zeta-yen-319702.BITCOIN.btc_extract_*` ) t
+WHERE row_num=1' 
+
 echo "Creating Model"
 bq query --nouse_legacy_sql \
 'CREATE OR REPLACE MODEL BITCOIN.ga_arima_model
@@ -23,9 +39,9 @@ OPTIONS
    data_frequency = "AUTO_FREQUENCY",
    decompose_time_series = TRUE
   ) AS
-SELECT EXTRACT(DATE FROM Date ) AS parsed_date, Open
+SELECT EXTRACT(DATE FROM Date ) AS parsed_date, Max(Open) as Open
 FROM
- `BITCOIN.btc_extract_*`'
+ `BITCOIN.v_price_data` order by 1'
 
 echo "Creating Prediction"
  bq query --nouse_legacy_sql \
@@ -38,7 +54,7 @@ FROM
 echo "Creating Crash tables"
  bq query --nouse_legacy_sql \
 'CREATE OR REPLACE TABLE BITCOIN.PRICE_CRASH as 
-	select ext.*,csh.crash_open  from `BITCOIN.btc_extract_*` ext left outer join (Select SNo,open as crash_open from (
+	select ext.*,csh.crash_open  from `BITCOIN.v_price_data` ext left outer join (Select SNo,open as crash_open from (
 	Select SNo,Date,open,old_open,open-old_open as price_chg from (
 	SELECT SNo, Date,Open,Lag(open,10) over (partition by Symbol  order by Date) as  old_open FROM `BITCOIN.btc_extract_*` 
 	) A where old_open is not null) B 
