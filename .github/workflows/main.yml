@@ -44,10 +44,11 @@ jobs:
       run: gcloud info
       
     - name: Use gcloud CLI
-      run: tree
+      run: tree  
       
-    - name: Use gd CLI
-      run:  ll     
+    - name: Run script file
+      run: |
+         chmod +x ./setupbq.sh 
+         ./setupbq.sh 
+      shell: bash
 
-    - name: Use gd CLI
-      run: ./setupbq.sh  
