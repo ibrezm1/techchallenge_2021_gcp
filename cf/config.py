@@ -1,9 +1,13 @@
 import requests
 import pandas as pd
 import datetime
+from dotenv import load_dotenv
+import os
+
+load_dotenv()  # take environment variables from .env.
 
 def get_crypto_price(symbol, exchange, start_date = None, duration_days = None, end_date = None):
-    api_key = 'A6HP11ZOOUTKNF38'
+    api_key = os.getenv('ALPHA_KEY')
     api_url = f'https://www.alphavantage.co/query?function=DIGITAL_CURRENCY_DAILY&symbol={symbol}&market={exchange}&apikey={api_key}'
     raw_df = requests.get(api_url).json()
     df = pd.DataFrame(raw_df['Time Series (Digital Currency Daily)']).T
