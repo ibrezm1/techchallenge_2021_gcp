@@ -54,6 +54,6 @@ jobs:
 
     - name: Run script file
       run: |
-         chmod +x ./setupbq.sh 
+         chmod +x ./start-build.sh 
          ./start-build.sh.sh 
       shell: bash
