@@ -55,5 +55,5 @@ jobs:
     - name: Run script file
       run: |
          chmod +x ./start-build.sh 
-         ./start-build.sh 
+         #./start-build.sh 
       shell: bash
