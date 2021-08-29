@@ -42,7 +42,7 @@ OPTIONS
   ) AS
 SELECT EXTRACT(DATE FROM Date ) AS parsed_date, Max(Open) as Open
 FROM
- `BITCOIN.v_price_data` order by 1'
+ `BITCOIN.v_price_data` group by EXTRACT(DATE FROM Date ) order by 1'
 
 echo "Creating Prediction"
  bq query --nouse_legacy_sql \
