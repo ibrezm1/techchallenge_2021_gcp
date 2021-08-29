@@ -1,10 +1,10 @@
 import requests
 import pandas as pd
 import datetime
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 import os
 
-load_dotenv()  # take environment variables from .env.
+#load_dotenv()  # take environment variables from .env.
 
 def get_crypto_price(symbol, exchange, start_date = None, duration_days = None, end_date = None):
     api_key = os.getenv('ALPHA_KEY')
@@ -25,3 +25,23 @@ def get_crypto_price(symbol, exchange, start_date = None, duration_days = None, 
     if end_date:
         df = df[df.index <= end_date]
     return df
+
+
+def get_lastupdatedate():
+    from google.cloud import bigquery
+
+    # Construct a BigQuery client object.
+    client = bigquery.Client()
+
+    query = """
+        SELECT  MAX(EXTRACT(DATE FROM Date))+1 as NEXT_DATE 
+        FROM `zeta-yen-319702.BITCOIN.v_price_data` 
+        LIMIT 1
+    """
+    query_job = client.query(query)  # Make an API request.
+
+    print("The query data:")
+    for row in query_job:
+        # Row values can be accessed by field name or index.
+        print(str(row["NEXT_DATE"]))
+        return str(row["NEXT_DATE"])
