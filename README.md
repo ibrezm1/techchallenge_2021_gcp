@@ -13,3 +13,6 @@ chmod +x setupbq.sh
 ./setupbq.sh
 ```
 ## Run the Notebook for Vertex AI setup
+
+## Final Presentations 
+[Final Presentatopms in Drive](https://drive.google.com/drive/u/0/folders/11HwUeelnL_k2aomVUbpEHQvy99GGKKdf)
